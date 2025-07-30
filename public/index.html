@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CDS Sports Meet Registration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="banner">
+  <img src="banner.png" alt="CDS Sports Meet Banner">
+</div>
+  <h1>🏆 CDS Sports Meet – Registration</h1>
+
+  <form id="regForm">
+    <input type="text" name="school" placeholder="School Name" required>
+    <input type="text" name="name" placeholder="Participant Name" required>
+    <input type="number" name="chest" placeholder="Chest Number" required>
+
+    <label>Date of Birth</label>
+    <input type="date" name="dob" required>
+
+    <label>Age Category</label>
+    <select name="ageCategory" required>
+      <option value="" disabled selected>Select Age Group</option>
+      <option>Under 11</option>
+      <option>Under 14</option>
+      <option>Under 16</option>
+      <option>Under 17</option>
+      <option>Under 19</option>
+    </select>
+
+    <label>Gender</label>
+    <select name="gender" required>
+      <option value="" disabled selected>Select Gender</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+
+    <label>Choose Events (select one or more)</label>
+    <div id="event-options">
+      <label><input type="checkbox" name="events" value="50m Race"> 50m Race</label>
+      <label><input type="checkbox" name="events" value="100m Race"> 100m Race</label>
+      <label><input type="checkbox" name="events" value="200m"> 200m</label>
+      <label><input type="checkbox" name="events" value="400m"> 400m</label>
+      <label><input type="checkbox" name="events" value="800m"> 800m</label>
+      <label><input type="checkbox" name="events" value="1500m"> 1500m</label>
+      <label><input type="checkbox" name="events" value="Shot Put"> Shot Put</label>
+      <label><input type="checkbox" name="events" value="Discus Throw"> Discus Throw</label>
+      <label><input type="checkbox" name="events" value="Long Jump"> Long Jump</label>
+      <label><input type="checkbox" name="events" value="High Jump"> High Jump</label>
+      <label><input type="checkbox" name="events" value="4x100m Relay"> 4x100m Relay</label>
+      <label><input type="checkbox" name="events" value="4x400m Relay"> 4x400m Relay</label>
+    </div>
+
+    <label>Upload Photo</label>
+    <input type="file" name="photo" accept="image/*" required>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="status"></div>
+
+  <script>
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById("status").innerText = "⏳ Submitting...";
+      document.getElementById("status").style.opacity = 1;
+
+      const formData = new FormData(this);
+      const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
+                                  .map(input => input.value);
+
+      const entry = {
+        school: formData.get("school"),
+        name: formData.get("name"),
+        chest: formData.get("chest"),
+        dob: formData.get("dob"),
+        ageCategory: formData.get("ageCategory"),
+        gender: formData.get("gender"),
+        events: selectedEvents
+      };
+
+      fetch('/results.json', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("status").innerText = "✅ Submission recorded!";
+        this.reset();
+      })
+      .catch(error => {
+        document.getElementById("status").innerText = "❌ Submission failed. Try again.";
+        console.error(error);
+      });
+    });
+  </script>
+</body>
+</html>
